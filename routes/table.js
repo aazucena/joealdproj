@@ -1,11 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const table = require('../services/table');
+import express from 'express'
+import { getMultiple, create, update, remove } from '../services/table.js'
+
+
+const router = express.Router()
 
 /* GET programming languages. */
 router.get('/', async function(req, res, next) {
   try {
-    res.json(await table.getMultiple(req.query.page));
+    res.json(await getMultiple(req.query.page));
   } catch (err) {
     console.error(`Error while getting table `, err.message);
     next(err);
@@ -15,7 +17,7 @@ router.get('/', async function(req, res, next) {
 /* POST programming language */
 router.post('/', async function(req, res, next) {
   try {
-    res.json(await table.create(req.body));
+    res.json(await create(req.body));
   } catch (err) {
     console.error(`Error while creating table`, err.message);
     next(err);
@@ -25,7 +27,7 @@ router.post('/', async function(req, res, next) {
 /* PUT programming language */
 router.put('/:id', async function(req, res, next) {
   try {
-    res.json(await table.update(req.params.id, req.body));
+    res.json(await update(req.params.id, req.body));
   } catch (err) {
     console.error(`Error while updating table`, err.message);
     next(err);
@@ -35,12 +37,11 @@ router.put('/:id', async function(req, res, next) {
 /* DELETE programming language */
 router.delete('/:id', async function(req, res, next) {
   try {
-    res.json(await table.remove(req.params.id));
+    res.json(await remove(req.params.id));
   } catch (err) {
     console.error(`Error while deleting row`, err.message);
     next(err);
   }
 });
 
-module.exports = router;
-
+export default router

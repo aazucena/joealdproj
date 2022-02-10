@@ -1,13 +1,13 @@
-const db = require('./db');
-const helper = require('../helper');
-const config = require('../config');
+import query from './db.js'
+import config from '../config.js'
+import { emptyOrRows, getOffset } from '../helper.js'
 
-async function getMultiple(page = 1){
-  const offset = helper.getOffset(page, config.listPerPage);
-  const rows = await db.query(
+export async function getMultiple(page = 1){
+  const offset = getOffset(page, config.listPerPage);
+  const rows = await query(
     `SELECT id, name, DOB FROM test_table LIMIT ${offset},${config.listPerPage}`
   );
-  const data = helper.emptyOrRows(rows);
+  const data = emptyOrRows(rows);
   const meta = {page};
 
   return {
@@ -16,8 +16,8 @@ async function getMultiple(page = 1){
   }
 }
 
-async function create(testTable){
-  const result = await db.query(
+export async function create(testTable){
+  const result = await query(
     `INSERT INTO test_table 
     (name, DOB) 
     VALUES 
@@ -33,8 +33,8 @@ async function create(testTable){
   return {message};
 }
 
-async function update(id, testTable){
-  const result = await db.query(
+export async function update(id, testTable){
+  const result = await query(
     `UPDATE test_table 
     SET name="${testTable.name}", DOB=${testTable.DOB} 
     WHERE id=${id}` 
@@ -49,8 +49,8 @@ async function update(id, testTable){
   return {message};
 }
 
-async function remove(id){
-  const result = await db.query(
+export async function remove(id){
+  const result = await query(
     `DELETE FROM test_table WHERE id=${id}`
   );
 
@@ -63,9 +63,3 @@ async function remove(id){
   return {message};
 }
 
-module.exports = {
-  getMultiple,
-  create,
-  update,
-  remove
-}
