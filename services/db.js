@@ -7,3 +7,4 @@ export default async function query(sql, params) {
 
   return results;
 }
+

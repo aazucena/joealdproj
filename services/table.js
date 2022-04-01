@@ -18,10 +18,7 @@ export async function getMultiple(page = 1){
 
 export async function create(testTable){
   const result = await query(
-    `INSERT INTO test_table 
-    (name, DOB) 
-    VALUES 
-    (${testTable.name}, ${testTable.DOB})`
+    `INSERT INTO test_table (name, DOB) VALUES (${testTable.name}, ${testTable.DOB})`
   );
 
   let message = 'Error in creating row';
