@@ -1,30 +1,29 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <main>
+    <!-- <ThemeProvider :breakpoints="sizes"> -->
+      <router-link to="/"></router-link>
+      <div class="container-fluid d-fluid justify-content-center vh-100 p-5">
+        <router-view/>
+      </div>
+    <!-- </ThemeProvider> -->
+  </main>
 </template>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<style lang="scss"> @import '@/styles/_variables.scss';</style>
+<script>
+  import { /*ThemeProvider*/ } from 'react-bootstrap'
+  export default {
+    // props: {
+    //   breakpoints: {
+    //     type: Array
+    //   }
+    // },
+    // data() {
+    //   return {
+    //     sizes: ["xxxl", "xxl", "xl", "lg", "md", "sm", "xs", "xxs"]
+    //   }
+    // },
+    components: {
+      //ThemeProvider,
+    },
+  }
+</script>
