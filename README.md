@@ -6,16 +6,19 @@
 
 ## Instructions
 1. ```zsh
-    npm install ./api
-   ```
-1. ```zsh
-    npm install ./web
+    cd ~/joealdproj
    ```
 2. ```zsh
+    npm install ./api
+   ```
+3. ```zsh
+    npm install ./web
+   ```
+4. ```zsh
     docker-compose up --build -d
    ```
    - Make sure that everything is running well, and all of the containers' indicators are green
-3. Go to your browser, type **http://localhost:3000**
+5. Go to your browser, type **http://localhost:3000**
    - Test out these endpoints with:
      - ```/api/:collection``` (browse all the items in the collection)
        - Example ```/api/collection```
