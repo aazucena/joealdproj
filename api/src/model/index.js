@@ -16,9 +16,8 @@ const model = (table = 'collection') => ({
         return await query(sql, [...values]).then(_ => _[0])
     },
     create: async (params) => {
-        const { columnSet, values } = multipleColumnSet(params)
-        //const sql = `INSERT INTO ${table} (${columnSet}) VALUES (${values})`
-        const result = await query(`INSERT INTO ${table} (${columnSet}) VALUES (${values})`)
+        const sql = `INSERT INTO ${table} (${Object.keys(params).join(', ')}) VALUES (${Object.keys(params).map(_ => '?').join(',')})`
+        const result = await query(sql, Object.values(params))
         return result ? result.affectedRows : 0
     },
     update: async (params, id) => {
@@ -26,8 +25,7 @@ const model = (table = 'collection') => ({
         return await query(`UPDATE ${table} SET ${columnSet} WHERE id = ?`, [...values, id])
     },
     delete: async (id) => {
-        const data = Object.values(id);
-        const result = await query(`DELETE FROM ${table} WHERE id=${data}`)
+        const result = await query(`DELETE FROM ${table} WHERE id = ?`, [id])
         return result ? result.affectedRows : 0
     }
 })
