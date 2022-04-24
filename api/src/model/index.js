@@ -15,15 +15,15 @@ const model = (table = 'collection') => ({
         // return back the first row of table
         return await query(sql, [...values]).then(_ => _[0])
     },
-    create: async (params) => {
-        const { columnSet, values } = multipleColumnSet(params)
-        //const sql = `INSERT INTO ${table} (${columnSet}) VALUES (${values})`
-        const result = await query(`INSERT INTO ${table} (${columnSet}) VALUES (${values})`)
+    create: async (params, id) => {
+        const data = Object.values(id);
+        let data2 = params;
+        const result = await query(`INSERT INTO ${table} (id, name) VALUES (${id}, '${params}')`)
         return result ? result.affectedRows : 0
     },
     update: async (params, id) => {
-        const { columnSet, values } = multipleColumnSet(params)
-        return await query(`UPDATE ${table} SET ${columnSet} WHERE id = ?`, [...values, id])
+        const data = Object.values(id);
+        return await query(`UPDATE ${table} SET name = '${params}' WHERE id = ${data}`)
     },
     delete: async (id) => {
         const data = Object.values(id);

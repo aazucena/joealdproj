@@ -21,20 +21,16 @@ const controller = (table = 'collection') => ({
     edit: async (req, res, next) => {
         // do the update query and get the result
         // it can be partial edit
-        const result = await model(table).update(req.body, req.params.id);
-        if (!result) throw new HttpException(404, 'Something went wrong');
+        const result = await model(table).update(req.params.name, req.params.id);
+        //if (!result) throw new HttpException(404, 'Something went wrong');
         const { affectedRows, changedRows, info } = result;
-
-        const message = !affectedRows ? 'Item not found' :
-            affectedRows && changedRows ? 'Item updated successfully' : 'Updated failed'
-
         res.send({ message, info });
         console.log(req);
         //res.json({  result: result })
     },
     add: async (req, res, next) => {
-        const result = await model(table).create(req.body);
-        if (!result) throw new HttpException(500, 'Something went wrong');
+        const result = await model(table).create(req.params.name, req.params.id);
+        //if (!result) throw new HttpException(500, 'Something went wrong');
         res.send(result);
         console.log(req);
         //res.json({ result: result })

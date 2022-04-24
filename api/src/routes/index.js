@@ -21,21 +21,21 @@ router.get('/:collection/id/:id', async (req, res, next) => {
     }
 }) // localhost:3000/api/collection/id/1
 
-router.patch('/:collection/update/id/:id', async (req, res, next) => {
+router.patch('/:collection/update/id/:id/name/:name', async (req, res, next) => {
     try {
         controller(req.params.collection).edit(req, res, next)
     } catch (err) {
         next(err)
     }
-}) // localhost:3000/api/collection/delete/id/1 , using patch for partial update
+}) // localhost:3000/api/collection/update/id/1/name/aldrin , using patch for partial update
 
-router.post('/:collection/add', async (req, res, next) => {
+router.post('/:collection/add/id/:id/name/:name', async (req, res, next) => {
     try {
         controller(req.params.collection).add(req, res, next)
     } catch (err) {
         next(err)
     }
-}) // localhost:3000/api/collection/add
+}) // localhost:3000/api/collection/add/id/5/name/Joe
 
 router.delete('/:collection/delete/id/:id', async (req, res, next) => {
     try {
