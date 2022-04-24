@@ -1,11 +1,11 @@
-DROP DATABASE IF EXISTS proj_db;
+/*DROP DATABASE IF EXISTS proj_db;*/
 CREATE DATABASE IF NOT EXISTS proj_db;
 USE proj_db;
 
-DROP TABLE IF EXISTS `collection`;
+/*DROP TABLE IF EXISTS `collection`;*/
 
 CREATE TABLE IF NOT EXISTS `collection` (
-    `id` int NOT NULL,
+    `id` int AUTO_INCREMENT NOT NULL,
     `name` varchar(64),
     PRIMARY KEY (id)
 );

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "api": "file:api",
+    "web": "file:web"
+  }
+}
