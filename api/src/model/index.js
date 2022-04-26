@@ -23,8 +23,7 @@ const model = (table = 'collection') => ({
         return await query(`UPDATE ${table} SET name = '${params}' WHERE id = ${id}`)
     },
     delete: async (id) => {
-        const data = Object.values(id);
-        const result = await query(`DELETE FROM ${table} WHERE id=${data}`)
+        const result = await query(`DELETE FROM ${table} WHERE id = ?`, [id])
         return result ? result.affectedRows : 0
     }
 })

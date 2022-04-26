@@ -39,7 +39,7 @@ router.post('/:collection/add/', async (req, res, next) => {
 
 router.delete('/:collection/delete/id/:id', async (req, res, next) => {
     try {
-        controller(req.params.collection).delete(req, res, next)
+        controller(req.params.collection).read(req, res, next)
     } catch (err) {
         next(err)
     }

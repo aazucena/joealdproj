@@ -21,7 +21,7 @@ app.use("/api", router)
 
 // 404 error
 app.all('*', (req, res, next) => {
-    const err = new HttpException(404, 'Endpoint Not FoundM')
+    const err = new HttpException(404, 'Endpoint Not Found')
     next(err)
 })
 
