@@ -4,4 +4,13 @@ module.exports = defineConfig({
   devServer: {
       port: 3333,
   },
+  css: {
+    loaderOptions: {
+      scss: {
+        additionalData: `
+          @import "@/styles/_variables.scss";
+        `
+      },
+    }
+  }
 })
