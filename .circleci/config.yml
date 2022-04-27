@@ -22,7 +22,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
           registry-id: AWS_ECR_REGISTRY_ID
           region: $AWS_REGION
-          repo: $APP_PREFIX
+          repo: joeyald
           tag: << pipeline.git.branch >>---<< pipeline.id >>
 
 # Invoke jobs via workflows
