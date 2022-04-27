@@ -2,25 +2,38 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+orbs:
+  aws: circleci/aws-cli@3.1.0
+  ecr: circleci/aws-ecr@8.1.0
+  ecs: circleci/aws-ecs@2.2.1
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  build:
     docker:
       - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
-      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - ecr/build-and-push-image:
+          repo: '${DOCKER_USERNAME}/${APP_PREFIX}'
+          tag: << pipeline.git.branch >>---<< pipeline.id >>
+
+  run-cli:
+    executor: aws/default
+    steps:
+      - aws/setup
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: Run AWS CLI
+          command: aws --version
+
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  build-and-deploy:
     jobs:
-      - say-hello
+      - build:
+          context:
+            - aws
