@@ -20,25 +20,25 @@
    - Make sure that everything is running well, and all of the containers' indicators are green
 5. Go to your browser, type **http://localhost:3000**
    - Test out these endpoints with:
-     - ```/api/:collection``` (browse all the items in the collection)
-       - Example ```/api/collection```
-     - ```/api/:collection/id/:id``` (read item by specific the collections)
-       - Example ```/api/collection/1```
-     - ```/api/:collection/update/id/:id``` (update item by id within the specific collection) **However, this needs some additional parameters, so it wouldn't work as it is**
-       - Example ```/api/collection/update/1```
+     - ```/api/items/:collection``` (browse all the items in the collection)
+       - Example ```/api/items/collection```
+     - ```/api/items/:collection/id/:id``` (read item by specific the collections)
+       - Example ```/api/items/collection/1```
+     - ```/api/items/:collection/update/id/:id``` (update item by id within the specific collection) **However, this needs some additional parameters, so it wouldn't work as it is**
+       - Example ```/api/items/collection/update/1```
         ```json
         {
             "name": "Computers" 
         }
         ```
-     - ```/api/:collection/id/add``` (create item to the collection) **However, this needs some additional parameters, so it wouldn't work as it is**
-       - Example ```/api/collection/add```
+     - ```/api/items/:collection/id/add``` (create item to the collection) **However, this needs some additional parameters, so it wouldn't work as it is**
+       - Example ```/api/items/collection/add```
         ```json
         {
-            "id": 5 [Autoincremented]
+            "id": 5
             "name": "Computers" 
         }
         ```
 
-     - ```/api/:collection/delete/id/:id``` (delete item by id within the specific collection)
-       - Example ```/api/collection/delete/1```
+     - ```/api/items/:collection/delete/id/:id``` (delete item by id within the specific collection)
+       - Example ```/api/items/collection/delete/1```
