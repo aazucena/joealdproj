@@ -17,6 +17,11 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - ecr/build-and-push-image:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-cli-version: latest
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          registry-id: AWS_ECR_REGISTRY_ID
+          region: $AWS_REGION
           repo: $APP_PREFIX
           tag: << pipeline.git.branch >>---<< pipeline.id >>
 
