@@ -33,7 +33,8 @@ const model = {
     table: {
         list: async() => {
             return await query(`SHOW TABLES`)
-                .then(_ => Object.values(_[0]))
+                .then(_ => Object.values(_[0])
+                    .map(obj => Object.values(obj)[0]))
         },
         create: async (table, params) => {
             var fields = (Array.isArray(params) === true) ?

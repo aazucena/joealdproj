@@ -1,38 +1,50 @@
 <template>
-  <div class="container-fluid">
-    <vue-select v-model="value" :options="options" label-by="name" searchable
-      value-by="index" class='w-100'
-    />
+  <div class="container-fluid vstack gap-3">
+    <vue-select v-model="value" :update="value"
+    :close-on-select="true" :selected="onSelect(value)"
+    search-placeholder="Search for table"
+    :options="options" searchable class='w-100 form-control'/>
+    <div v-if="results.length > 0">
+      <CustomTable :rows="results" />
+    </div>
   </div>
 </template>
 
 <script>
 
 import VueSelect from 'vue-next-select'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import CustomTable from '@/components/CustomTable'
+import { api } from '../../utilities/services'
 
 export default {
     name: 'BrowseForm',
     components: {
-      VueSelect
+      VueSelect,
+      CustomTable,
     },
-    data(){
+    setup() {
+      var value = ref(null),
+        options = ref([]),
+        results = ref([])
+      onMounted(async() => {
+        options.value = await api.tables.list()
+      })
       return {
-        value: ref(null),
-        options: ref([])
+        value, 
+        options, 
+        results, 
       }
     },
-    async created() {
-      try {
-        this.options = await this.axios.get(process.env.API_URL ?? 'https://www.dnd5eapi.co/api/monsters')
-          .then((response) => {
-            var data = response.data
-            console.log(data.results)
-            return data.results
+    methods: {
+      async onSelect(value) {
+        if (value) {
+          this.results = await api.collections(value).browse().then(_ => {
+              if (_) console.log(_)
+              return _?.at(0)
           })
-      } catch (error) {
-        console.log(error);
-      }
+        }
+      },
     }
 }
 </script>

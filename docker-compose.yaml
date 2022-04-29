@@ -22,8 +22,8 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: proj_db
-  proj_api:
-    container_name: proj_api
+  api:
+    container_name: api
     build: ./api
     networks:
       - frontend
@@ -45,8 +45,8 @@ services:
       - proj_db
     ports: 
       - "3000:3000"
-  proj_web:
-    container_name: proj_web
+  web:
+    container_name: web
     build: ./web
     networks:
       - frontend
@@ -55,7 +55,7 @@ services:
       PORT: 3333
     restart: on-failure
     depends_on:
-      - proj_api
+      - api
     ports: 
       - "3333:3333"
 

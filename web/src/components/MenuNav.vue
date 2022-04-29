@@ -14,7 +14,9 @@
                     <div style='width: 10%;'>
                         <hr />
                     </div>
-                    <component :is="item.form" :class="item.name"/>
+                    <suspense>
+                        <component :is="item.form" :class="item.name"/>
+                    </suspense>
                 </div>
             </div>
         </div>

@@ -6,4 +6,7 @@ import router from './router'
 import store from './store'
 import VueSelect from 'vue-next-select'
 import 'bootstrap'
-createApp(App).use(store).use(router).use(VueAxios, axios).component('vue-select', VueSelect).mount('#app')
+
+const app = createApp(App).use(store)
+app.use(router).use(VueAxios, axios).provide('axios', app.config.globalProperties.axios)
+    .component('vue-select', VueSelect).mount('#app')
