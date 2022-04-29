@@ -12,10 +12,10 @@ export const api = {
         read: async (id, params = {}) => await
             axios.get(`items/${collection}/${id}`, {
                 params: params ?? {},
-            }).then(res => res.data)
+            }).then(res => res.data[0])
                 .catch(e => console.log(e)),
         edit: async (id, data) =>
-            await axios.patch(`items/${collection}/edit/${id}`, {
+            await axios.patch(`items/${collection}/update/${id}`, {
                 data: data ?? {},
             }).then(res => res.data)
                 .catch(e => console.log(e)),
