@@ -1,11 +1,14 @@
 <template>
-    <div>
+    <div class='vstack gap-3'>
+        <div class='fs-4'> Result Table:</div>
         <v-table-lite
             :is-loading="table.isLoading"
             :columns="table.columns"
             :rows="table.rows"
             :total="table.totalRecordCount"
             :sortable="table.sortable"
+            @do-search="doSearch"
+            @is-finished="tableLoadingFinish"
             />
     </div> 
 </template>
@@ -42,12 +45,53 @@ export default {
                         isKey: (field === 'id'),
                     })),
                 rows: this.rows,
-                totalRecordCount: 0,
+                totalRecordCount: this.rows.length,
                 sortable: {
                     order: "id",
                     sort: "asc",
                 },
             })
+        }
+    },
+    methods: {
+        onSearch(offset=0, limit=10, order='id', sort='asc') {
+
+            const sortBy = (a, b) => {
+                var type_a = a[order], type_b = b[order]
+                switch (typeof type_a) {
+                    case 'string':
+                        if (type_a.toUpperCase() < type_b.toUpperCase()) 
+                            return (sort === 'asc') ? -1 : 1
+                        if (type_a.toUpperCase() > type_b.toUpperCase()) 
+                            return (sort === 'asc') ? 1 : -1
+                        return 0
+                    case 'number':
+                        return (sort === 'asc') ? type_a - type_b : type_b - type_a
+                    default:
+                        return 0 
+                }
+            }
+
+            this.table = reactive({
+                isLoading: true,
+                columns: this.columns ?? Object.keys(this.rows[0])?.map((field, i) => ({
+                        label: (field === 'id') ? 'ID' : 
+                            field.charAt(0).toUpperCase() + field.slice(1),
+                        field: field,
+                        width: `${(i + 1)/Object.keys(this.rows[0]).length}%`,
+                        sortable: true,
+                        isKey: (field === 'id'),
+                    })),
+                rows: this.rows.slice(offset, limit).sort(sortBy),
+                totalRecordCount: this.rows.length,
+                sortable: {
+                    order: "id",
+                    sort: "asc",
+                },
+            })
+        },
+        tableLoadingFinish() {
+            this.table.isLoading = false
         }
     },
 }

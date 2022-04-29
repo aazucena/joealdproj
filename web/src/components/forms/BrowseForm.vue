@@ -1,5 +1,6 @@
 <template>
-  <div class="container-fluid vstack gap-3">
+  <div class="container-fluid vstack gap-4">
+    <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
     :close-on-select="true" :selected="onSelect(value)"
     search-placeholder="Search for table"
