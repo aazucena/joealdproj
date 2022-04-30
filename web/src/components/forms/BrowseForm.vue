@@ -2,6 +2,7 @@
   <div class="container-fluid vstack gap-4">
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
+    :loading='!(options.length > 0)'
     :close-on-select="true" :selected="onSelect(value)"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
@@ -28,6 +29,7 @@ export default {
       var value = ref(null),
         options = ref([]),
         results = ref([])
+
       onMounted(async() => {
         options.value = await api.tables.list()
       })
@@ -42,10 +44,13 @@ export default {
         if (value) {
           this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
-              return _?.at(0)
+              return _.data
           })
         }
       },
+    },
+    unmounted() {
+      this.results = []
     }
 }
 </script>

@@ -4,6 +4,7 @@
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
         <vue-select v-model="value" :update="value"
+        :loading='!(options.length > 0)'
         :close-on-select="true" :selected="onTableSelect(value)"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
@@ -65,7 +66,7 @@ export default {
         if (value) {
           this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
-              return _?.at(0).map()
+              return _.data
           })
         }
       },
@@ -79,6 +80,9 @@ export default {
               return _
           })
       }
+    },
+    unmounted() {
+      this.results = []
     }
 }
 </script>

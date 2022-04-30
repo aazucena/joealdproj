@@ -10,12 +10,12 @@ export const api = {
             }).then(res => res.data)
                 .catch(e => console.log(e)),
         read: async (id, params = {}) => await
-            axios.get(`items/${collection}/${id}`, {
+            axios.get(`items/${collection}/id/${id}`, {
                 params: params ?? {},
             }).then(res => res.data[0])
                 .catch(e => console.log(e)),
         edit: async (id, data) =>
-            await axios.patch(`items/${collection}/update/${id}`, {
+            await axios.patch(`items/${collection}/update/id/${id}`, {
                 data: data ?? {},
             }).then(res => res.data)
                 .catch(e => console.log(e)),
@@ -25,7 +25,7 @@ export const api = {
             }).then(res => res.data)
                 .catch(e => console.log(e)),
         delete: async (id) =>
-            await axios.delete(`items/${collection}/delete/${id}`)
+            await axios.delete(`items/${collection}/delete/id/${id}`)
                 .then(res => res.data)
                 .catch(e => console.log(e)),
         getFields: async () =>
