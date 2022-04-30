@@ -14,12 +14,14 @@ const model = {
             let sql = `SELECT * FROM ${table} WHERE ${columnSet}`
             return await query(sql, [...values]).then(_ => _[0])
         },
-        create: async (id, name) => {
-            const result = await query(`INSERT INTO ${table} (id, name) VALUES (${id}, '${name}')`)
+        create: async (data) => {
+            var fields =  Object.keys((Array.isArray(data)) ? data[0] : data).join(', ')
+            const result = await query(`INSERT INTO ${table} (${fields}) VALUES ?`, data)
             return result ? result.affectedRows : 0
         },
         update: async (params, id) => {
-            return await query(`UPDATE ${table} SET name = '${params}' WHERE id = ${id}`)
+            const {columnSet, values} = format.column(params)
+            return await query(`UPDATE ${table} ${(columnSet) ? `SET ${columnSet}` : ''} WHERE id = ${id}`, values)
         },
         delete: async (id) => {
             const result = await query(`DELETE FROM ${table} WHERE id = ?`, [id])
