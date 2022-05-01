@@ -1,9 +1,14 @@
 import { createApp } from 'vue'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import Toast from "vue-toastification"
 import VueSelect from 'vue-next-select'
 import 'bootstrap'
-createApp(App).use(store).use(router).use(VueAxios, axios).component('vue-select', VueSelect).mount('#app')
+import "vue-toastification/dist/index.css"
+import { plugin, defaultConfig } from '@formkit/vue'
+
+const app = createApp(App).use(store)
+
+
+app.use(router).component('vue-select', VueSelect).use(Toast).use(plugin, defaultConfig).mount('#app')

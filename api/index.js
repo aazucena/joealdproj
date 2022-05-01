@@ -28,4 +28,4 @@ app.all('*', (req, res, next) => {
 // Error middleware
 app.use(errorMiddleware)
 
-app.listen(process.env.API_PORT, () => console.log(`listening at http://localhost:${process.env.PORT}`))
+app.listen(process.env.API_PORT ?? 3000, () => console.log(`listening at http://localhost:${process.env.API_PORT ?? 3000}`))
