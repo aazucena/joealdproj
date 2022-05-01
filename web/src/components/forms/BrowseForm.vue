@@ -3,7 +3,7 @@
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
     :loading='!(options.length > 0)'
-    :close-on-select="true" :selected="onSelect(value)"
+    :close-on-select="true" @click="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
     <div v-if="results.length > 0">
@@ -17,7 +17,8 @@
 import VueSelect from 'vue-next-select'
 import { ref, onMounted } from 'vue'
 import CustomTable from '@/components/CustomTable'
-import { api } from '../../utilities/services'
+import { api, formatString } from '@/utilities/services'
+import { useToast } from 'vue-toastification'
 
 export default {
     name: 'BrowseForm',
@@ -26,6 +27,7 @@ export default {
       CustomTable,
     },
     setup() {
+      const toast = useToast()
       var value = ref(null),
         options = ref([]),
         results = ref([])
@@ -37,14 +39,21 @@ export default {
         value, 
         options, 
         results, 
+        toast,
+        formatString,
       }
     },
     methods: {
-      async onSelect(value) {
-        if (value) {
-          this.results = await api.collections(value).browse().then(_ => {
+      async onSelect(event) {
+        if (event) event.preventDefault()
+        if (this.value) {
+          console.log(this.value)
+          this.results = await api.collections(this.value).browse().then(_ => {
               if (_) console.log(_)
+              this.toast.success(`Listed Data to the ${this.value} Table`)
               return _.data
+          }).catch(() => {
+              this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
           })
         }
       },

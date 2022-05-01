@@ -5,24 +5,41 @@
                 <div class='fs-3 fw-light'>Choose your table: </div>
                 <vue-select v-model="value" :update="value"
                 :loading='!(options.length > 0)'
-                :close-on-select="true" :selected="onSelect(value)"
+                :close-on-select="true" @click="onSelect"
                 search-placeholder="Search for table"
                 :options="options" searchable class='w-100 form-control'/>
             </div>
             <div class='w-25 vstack gap-3'>
                 <div class='fs-3 fw-light'>Type your ID: </div>
-                <input type='number' class='form-control' @change='onChange($event)' 
+                <input type='number' class='form-control' @change='onChange' 
                 v-model.number='id' />
             </div>
             <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-                <button type='button' @click='onClick' :disabled="id !== null && value !== null"
+                <button type='button' @click='onClick'
                 class="btn btn-success btg-lg p-3 w-25 fw-bold fs-5">
                 Find
                 </button>
             </div>
         </div>
         <Suspense>
-            <FormKitSchema :schema="schema" :data="data" />
+            <div v-if="data && schema" class='vstack gap-2'>
+                <div class='w-100 py-3'><hr /></div>
+                <div class='fs-4 fw-light'>Update Form: </div>
+                <FormKit type="group" class='vstack gap-3' v-model="data">
+                    <FormKit v-for='(field, i) in schema' v-bind:key='i' 
+                            :type='field.props.type'
+                            :label='formatString(field.props.label)'
+                            :name='field.props.name'
+                            :validation='field.props.validation'
+                            @change='onInputChange'
+                                />
+                    <div class="formkit-wrapper">
+                        <button type="submit" class="formkit-input" name="submit_2" id="input_2" @click="onSubmit">
+                            Submit
+                        </button>
+                    </div>
+                </FormKit>
+            </div>
             <template #fallback>
                 Loading...
             </template>
@@ -34,21 +51,25 @@
 
 import VueSelect from 'vue-next-select'
 import { ref, onMounted } from 'vue'
-import { api } from '../../utilities/services'
-import { FormKitSchema } from '@formkit/vue'
+import { api, formatString } from '@/utilities/services'
+import { FormKit, /*FormKitSchema*/ } from '@formkit/vue'
+import { useToast } from 'vue-toastification'
 export default {
     name: 'EditForm',
     components: {
         VueSelect,
-        FormKitSchema,
+        // FormKitSchema,
+        FormKit,
     },
     setup() {
+        const toast = useToast()
         var value = ref(null),
             options = ref([]),
             results = ref([]),
             fields = ref([]),
             data = ref({}),
-            schema = ref([]),
+            changed = ref({}),
+            schema = ref(null),
             id = null
             
         onMounted(async() => {
@@ -56,26 +77,46 @@ export default {
         })
         return {
             value, 
-            options, 
+            options,
+            changed,
             results,
             fields,
-            loaded: false,
             data,
             schema,
-            id
+            id,
+            toast,
+            formatString
         }
     },
     methods: {
-        async onSelect(value) {
+        async onSelect(event) {
+            if (event) event.preventDefault()
+            var value = this.value
             if (value) {
                 this.results = await api.collections(value).browse().then(_ => {
                     if (_) console.log(_)
                     return _.data
                 })
             } else {
-                this.loaded = false
                 console.log(this.loaded)
             }
+        },
+        async onSubmit(event) {
+            if (event) event.preventDefault()
+            await api.collections(this.value).edit(this.id, this.changed)
+                .then(() => {
+                    this.toast.success(`Updated Data to the ${this.value} Table`)
+                })
+                .catch(() => {
+                    this.toast.error(`Failed to Update Data to the ${this.value} Table`)
+                })
+        },
+        onInputChange(event) {
+            this.changed = { 
+                ...this.changed, 
+                [event.target.name]: event.target.value
+            }
+            console.log(this.changed)
         },
         onChange(event) {
             console.log(event.target.value)
@@ -83,7 +124,10 @@ export default {
         },
         async onClick() {
             this.data = await api.collections(this.value).read(this.id).then(_ => {
-                if (_) console.log(_)
+                if (_) {
+                    delete _.id
+                    console.log(_)
+                }
                 return _
             })
             this.fields = await api.collections(this.value).getFields().then(_ => {
@@ -121,19 +165,18 @@ export default {
                         return 'text'
                 }
             }
-            var fields = this.fields.filter(_ => _.Field !== 'id').map(_ => ({
-                    $formkit: getType(_.Type),
-                    name: _.Field,
-                    label: `Enter ${_.Field}`,
-                    validation: (_.Null === 'YES') ? 'optional' : 'required'
+            this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
+                .map(_ => ({
+                    $cmp: 'FormKit',
+                    props: {
+                        type: getType(_.Type),
+                        name: _.Field,
+                        label: `Enter ${_.Field}`,
+                        validation: (_.Null === 'YES') ? 'optional' : 'required',
+                        value: `$${_.Field}`
+                    },
                 }))
-            console.log(fields)
-            this.schema = [...fields, {
-                $formkit: 'submit',
-                label: `Submit new ${this.value} item`
-            }]
-            this.loaded = true
-            console.log(this.loaded, this.schema)
+            this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
         }
     },
     unmounted() {
@@ -143,5 +186,4 @@ export default {
 </script>
 
 <style>
-
 </style>

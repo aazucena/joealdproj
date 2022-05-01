@@ -3,9 +3,9 @@
     <div class='hstack gap-4 d-flex align-items-center'>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
-        <vue-select v-model="value" :update="value"
+        <vue-select v-model="value"
         :loading='!(options.length > 0)'
-        :close-on-select="true" :selected="onTableSelect(value)"
+        :close-on-select="true" @click="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
       </div>
@@ -25,7 +25,7 @@
         class="alert alert-info p-2 border border-2 border-info">
       <div v-for='[key, value] in Object.entries(item)' :key='key'>
         <div class="fs-4 fw-normal m-4 hstack gap-4" role="alert">
-          <span>{{ (key === 'id') ? 'ID' : key.charAt(0).toUpperCase() + key.slice(1) }}:</span>
+          <span>{{ (key === 'id') ? 'ID' : formatString(key) }}:</span>
           <span>{{ value }}</span>
         </div>
       </div>
@@ -36,13 +36,15 @@
 <script>
 import VueSelect from 'vue-next-select'
 import { ref, onMounted } from 'vue'
-import { api } from '../../utilities/services'
+import { api, formatString } from '@/utilities/services'
+import { useToast } from 'vue-toastification'
 export default {
     name: 'ReadForm',
     components: {
       VueSelect,
     },
     setup() {
+      const toast = useToast()
       var value = ref(null),
         options = ref([]),
         results = ref([]),
@@ -59,10 +61,14 @@ export default {
         results, 
         id,
         item,
+        toast,
+        formatString
       }
     },
     methods: {
-      async onTableSelect(value) {
+      async onTableSelect(event) {
+        if (event) event.preventDefault()
+        var value = this.value
         if (value) {
           this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
@@ -77,7 +83,10 @@ export default {
       async onClick() {
           this.item = await api.collections(this.value).read(this.id).then(_ => {
               if (_) console.log(_)
+              this.toast.success(`Read Data with ID ${this.id} ${this.value} Table`)
               return _
+          }).catch(() => {
+              this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
           })
       }
     },

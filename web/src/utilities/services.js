@@ -2,6 +2,12 @@ import customAPI from './api.js'
 
 const axios = customAPI()
 
+export const formatString = s =>
+(s.replaceAll('_id', '')
+    .replaceAll("_", " ").toLowerCase()
+    .split(' ').map((_) => _.charAt(0).toUpperCase() + _.substring(1))
+    .join(' ').trim())
+
 export const api = {
     collections: (collection) => ({
         browse: async (params = {}) =>
@@ -15,14 +21,11 @@ export const api = {
             }).then(res => res.data[0])
                 .catch(e => console.log(e)),
         edit: async (id, data) =>
-            await axios.patch(`items/${collection}/update/id/${id}`, {
-                data: data ?? {},
-            }).then(res => res.data)
+            await axios.patch(`items/${collection}/update/id/${id}`, data).then(res => res.data)
                 .catch(e => console.log(e)),
         add: async (data) =>
-            await axios.post(`items/${collection}/add/`, {
-                data: data ?? {},
-            }).then(res => res.data)
+            await axios.post(`items/${collection}/add/`, data)
+                .then(res => res.data)
                 .catch(e => console.log(e)),
         delete: async (id) =>
             await axios.delete(`items/${collection}/delete/id/${id}`)

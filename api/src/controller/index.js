@@ -17,13 +17,12 @@ const controller = {
             res.send(result)
         },
         edit: async (req, res, next) => {
-            const result = await model.collection(table).update(req.body.name, req.params.id)
+            const result = await model.collection(table).update(req.params.id, req.body )
             if (!result) throw new HttpException(404, 'Something went wrong')
             res.send('Item has been updated')
         },
         add: async (req, res, next) => {
-            const result = await model.collection(table).create(req.body)
-            if (!result) throw new HttpException(500, 'Something went wrong')
+            await model.collection(table).create(req.body)
             res.send('Item has been created')
         },
         delete: async (req, res, next) => {
@@ -44,8 +43,7 @@ const controller = {
             res.send(list)
         },
         create: async (req, res, next) => {
-            const result = await model.table.create(req.body.table, req.body.fields)
-            if (!result) throw new HttpException(500, 'Something went wrong')
+            await model.table.create(req.body.table, req.body.fields)
             res.send('Table has been created')
         },
         drop: async (req, res, next) => {

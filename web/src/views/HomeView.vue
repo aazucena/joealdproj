@@ -1,21 +1,18 @@
 <template>
-  <div class="home vstack gap-2 h-100">
-    <div class="fs-1 fw-bolder">KBV Database UI</div>
-    <hr class='mb-2'>
-    <MenuNav/>
-    <FooterBar/>
+  <div class="container vstack gap-4 my-4">
+    <div class="fs-2"> Welcome to the KBV CMS Application!</div>
+    <div style='width: 30%;'><hr /></div>
+    <div class="px-2 fw-light fs-3">
+      <i>Choose one of the navigation above</i>
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import MenuNav  from '@/components/MenuNav'
-import FooterBar  from '@/components/FooterBar'
 export default {
   name: 'HomeView',
   components: {
-    MenuNav,
-    FooterBar,
   }
 }
 </script>

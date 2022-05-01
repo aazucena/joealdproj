@@ -16,6 +16,7 @@
 <script>
 import VueTableLite from 'vue3-table-lite'
 import { reactive } from 'vue'
+import { formatString } from '@/utilities/services'
 export default {
     name: 'CustomTable',
     components: {
@@ -38,7 +39,10 @@ export default {
                 isLoading: false,
                 columns: this.columns ?? Object.keys(this.rows[0])?.map((field, i) => ({
                         label: (field === 'id') ? 'ID' : 
-                            field.charAt(0).toUpperCase() + field.slice(1),
+                            field.replaceAll('_id', '')
+                                .replaceAll("_", " ").toLowerCase()
+                                .split(' ').map((_) => _.charAt(0).toUpperCase() + _.substring(1))
+                                .join(' ').trim(),
                         field: field,
                         width: `${(i + 1)/Object.keys(this.rows[0]).length}%`,
                         sortable: true,
@@ -50,7 +54,8 @@ export default {
                     order: "id",
                     sort: "asc",
                 },
-            })
+            }),
+            formatString
         }
     },
     methods: {

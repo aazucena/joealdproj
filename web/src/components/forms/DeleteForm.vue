@@ -5,13 +5,13 @@
         <div class='fs-3 fw-light'>Choose your table: </div>
         <vue-select v-model="value" :update="value"
         :loading='!(options.length > 0)'
-        :close-on-select="true" :selected="onTableSelect(value)"
+        :close-on-select="true" @click="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
       </div>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Type your ID: </div>
-        <input type='number' class='form-control' @change='onChange($event)' 
+        <input type='number' class='form-control' @change='onChange' 
           v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
@@ -21,22 +21,14 @@
         </button>
       </div>
     </div>
-    <!-- <div v-if="Object.keys(item).length > 0" 
-        class="alert alert-info p-2 border border-2 border-info">
-      <div v-for='[key, value] in Object.entries(item)' :key='key'>
-        <div class="fs-4 fw-normal m-4 hstack gap-4" role="alert">
-          <span>{{ (key === 'id') ? 'ID' : key.charAt(0).toUpperCase() + key.slice(1) }}:</span>
-          <span>{{ value }}</span>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
 <script>
 import VueSelect from 'vue-next-select'
 import { ref, onMounted } from 'vue'
-import { api } from '../../utilities/services'
+import { api, formatString } from '@/utilities/services'
+import { useToast } from 'vue-toastification'
 
 export default {
     name: 'DeleteForm',
@@ -44,6 +36,7 @@ export default {
       VueSelect,
     },
     setup() {
+      const toast = useToast()
       var value = ref(null),
         options = ref([]),
         results = ref([]),
@@ -60,10 +53,14 @@ export default {
         results, 
         id,
         item,
+        toast,
+        formatString,
       }
     },
     methods: {
-      async onTableSelect(value) {
+      async onTableSelect(event) {
+        if (event) event.preventDefault()
+        var value = this.value
         if (value) {
           this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
@@ -77,6 +74,12 @@ export default {
       },
       async onClick() {
           await api.collections(this.value).delete(this.id)
+          .then(() => {
+            this.toast.success(`Delete Data to the ${this.value} Table`)
+          })
+          .catch(() => {
+            this.toast.error(`Failed to Delete Data to the ${this.value} Table`)
+          })
       }
     },
     unmounted() {
