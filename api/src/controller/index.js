@@ -27,7 +27,7 @@ const controller = {
         },
         delete: async (req, res, next) => {
             const result = await model.collection(table).delete(req.params.id)
-            if (!result) throw new HttpException(404, 'Item not found')
+            //if (!result) throw new HttpException(404, 'Item not found')
             res.send('Item has been deleted')
         },
         getFields: async (req, res, next) => {
