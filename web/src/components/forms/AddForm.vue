@@ -3,7 +3,7 @@
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
     :loading='!(options?.length > 0)'
-    :close-on-select="true" @click="onSelect"
+    :close-on-select="true" @selected="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
     <Suspense>
@@ -69,77 +69,107 @@ export default {
       }
     },
     methods: {
-      async onSelect(event) {
-        if (event) event.preventDefault()
-        var value = this.value
+      async onSelect(value) {
         if (value) {
-          this.fields = await api.collections(value).getFields().then(_ => {
-              if (_) console.log(_)
-              return _
-          })
-          const getType = (type) => {
-              var typeName = (type.includes('(')) ? 
-                      type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
-              switch(typeName) {
-                  case 'tinyint':
-                  case 'smallint':
-                  case 'mediumint':
-                  case 'int':
-                  case 'bigint':
-                  case 'decimal':
-                  case 'float':
-                  case 'double':
-                  case 'bit':
-                      return 'number'
-                  case 'longtext':
-                  case 'longblob':
-                      return 'textarea'
-                  case 'year':
-                  case 'date':
-                      return 'date'
-                  case 'time':
-                      return 'time'
-                  case 'datetime':
-                  case 'timestamp':
-                      return 'datetime-local'
-                  case 'json':
-                      return 'select'
-                  default:
-                      return 'text'
-              }
-          }
+            this.value = value
+            this.fields = await api.collections(value).getFields().then(_ => {
+                if (_) console.log(_)
+                return _
+            })
+            const getType = (type) => {
+                var typeName = (type.includes('(')) ? 
+                        type.split('(')?.at(0).toLowerCase() : type.toLowerCase(),
+                    length = type.split('(')?.at(1).replaceAll(')', '').split(',')
+                switch(typeName) {
+                    case 'tinyint':
+                    case 'smallint':
+                    case 'mediumint':
+                    case 'int':
+                    case 'bigint':
+                    case 'decimal':
+                    case 'float':
+                    case 'double':
+                    case 'bit':
+                      var nmaxlen = (length?.at(0)) ? { maxlength: length?.at(0)} : {}
+                      return {
+                        type: 'number',
+                        ...nmaxlen
+                      }
+                    case 'longtext':
+                    case 'longblob':
+                        return {
+                          type: 'textarea',
+                        }
+                    case 'year':
+                    case 'date':
+                        return {
+                          type: 'date',
+                        }
+                    case 'time':
+                        return {
+                          type: 'time',
+                        }
+                    case 'datetime':
+                    case 'timestamp':
+                        return {
+                          type: 'datetime-local',
+                        }
+                    case 'json':
+                        return {
+                          type: 'select',
+                        }
+                    default:
+                      var cmaxlen = (length?.at(0)) ? { maxlength: length?.at(0)} : {}
+                      return {
+                        type: 'text',
+                        ...cmaxlen
+                      }
+                }
+            }
             this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
                 .map(_ => ({
                     $cmp: 'FormKit',
                     props: {
-                        type: getType(_.Type),
+                      ...getType(_.Type),
                         name: _.Field,
                         label: `Enter ${_.Field}`,
                         validation: (_.Null === 'YES') ? 'optional' : 'required',
-                        value: `$${_.Field}`
-                    },
+                        value: `$${_.Field}`,
+                    }
                 }))
-            console.log(this.schema)
-        }
+          } else {
+            this.fields = []
+            this.schema = []
+          }
       },
       async onSubmit(event) {
-          if (event) event.preventDefault()
-          await api.collections(this.value).add(this.data)
-          .then(() => {
-            this.toast.success(`Added Data to the ${this.value} Table`)
-          })
-          .catch((e) => {
-            console.log(e)
-            this.toast.error(`Failed to Add Data to the ${this.value} Table`)
-          })
-      },
-    },
-    onInputChange(event) {
-        this.data = { 
-            ...this.data, 
-            [event.target.name]: event.target.value
+        if (event) event.preventDefault()
+        switch(true) {
+          case this.data && Object.keys(this.data) <= 0 :
+            this.toast.error(`The data is empty`)
+            break
+          case this.value == null:
+            this.toast.error(`The input for ID is empty`)
+            break
+          default:
+            await api.collections(this.value).add(this.data)
+            .then(() => {
+              this.toast.success(`Added Data to the ${this.value} Table`)
+              this.schema = []
+              this.$router.push({path: '/browse'})
+            })
+            .catch((e) => {
+              console.log(e)
+              this.toast.error(`Failed to Add Data to the ${this.value} Table`)
+            })
         }
-        console.log(this.data)
+      },
+      onInputChange(event) {
+          this.data = { 
+              ...this.data, 
+              [event.target.name]: event.target.value
+          }
+      },
     },
     unmounted() {
         this.value = null

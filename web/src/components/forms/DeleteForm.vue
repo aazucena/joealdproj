@@ -3,19 +3,18 @@
     <div class='hstack gap-4 d-flex align-items-center'>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
-        <vue-select v-model="value" :update="value"
-        :loading='!(options?.length > 0)'
-        :close-on-select="true" @click="onTableSelect"
+      <vue-select v-model="value" :update="value"
+      :loading='!(options?.length > 0)'
+      :close-on-select="true" @selected="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
       </div>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Type your ID: </div>
-        <input type='number' class='form-control' @change='onChange' 
-          v-model.number='id' />
+        <input type='number' class='form-control' @keydown='onChange' v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-        <button type='button' @click='onClick' :disabled="value == null && id == null"
+        <button type='button' @click='onClick'
           class="btn btn-warning btg-lg p-3 w-25 fw-bold fs-5">
           Delete
         </button>
@@ -58,10 +57,9 @@ export default {
       }
     },
     methods: {
-      async onTableSelect(event) {
-        if (event) event.preventDefault()
-        var value = this.value
+      async onTableSelect(value) {
         if (value) {
+            this.value = value
             this.results = await api.collections(value).browse().then(_ => {
                 if (_) console.log(_)
                 return _.data
@@ -73,17 +71,18 @@ export default {
         this.id = event.target.value
       },
       async onClick() {
-        switch(false) {
-            case this.value:
-                this.toast.error(`The Value for Table is Empty`)
-                break
-            case this.id:
-                this.toast.error(`The Value for ID is Empty`)
-                break
+        switch(true) {
+            case this.value == null:
+              this.toast.error(`The input for table is empty`)
+              break
+            case this.id == null:
+              this.toast.error(`The input for ID is empty`)
+              break
             default:
               await api.collections(this.value).delete(this.id)
               .then(() => {
                 this.toast.success(`Delete Data to the ${this.value} Table`)
+                this.$router.push({path: '/browse'})
               })
               .catch((e) => {
                 console.log(e)

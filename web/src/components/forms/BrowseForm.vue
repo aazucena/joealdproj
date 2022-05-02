@@ -3,10 +3,10 @@
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
     :loading='!(options?.length > 0)'
-    :close-on-select="true" @click="onSelect"
+    :close-on-select="true" @selected="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
-    <CustomTable v-if="results?.length > 0" :rows="results" />
+    <CustomTable v-if="results?.length > 0 && value" :rows="results" />
   </div>
 </template>
 
@@ -42,22 +42,23 @@ export default {
       }
     },
     methods: {
-      async onSelect(event) {
-        if (event) event.preventDefault()
-        if (this.value) {
-          this.results = []
-          console.log(this.value)
-          this.results = await api.collections(this.value).browse().then(_ => {
+      async onSelect(value) {
+        this.results = []
+        if (value) {
+          this.value = value
+          this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
-              this.toast.success(`Listed Data to the ${this.value} Table`)
+              if (_.data.length > 0)
+                this.toast.success(`Listed Data to the ${value} Table`)
               return _.data
           })
           .catch((e) => {
               console.log(e)
-              this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
+              this.toast.error(`Failed to Retrieve Data from ${value} Table`)
           })
         } else {
           this.results = []
+          this.value.value = null
         }
       },
     },

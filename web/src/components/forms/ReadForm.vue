@@ -3,19 +3,18 @@
     <div class='hstack gap-4 d-flex align-items-center'>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
-        <vue-select v-model="value"
+        <vue-select v-model="value" :update="value"
         :loading='!(options?.length > 0)'
-        :close-on-select="true" @click="onTableSelect"
+        :close-on-select="true" @selected="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
       </div>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Type your ID: </div>
-        <input type='number' class='form-control' @change='onChange' 
-          v-model.number='id' />
+        <input type='number' class='form-control' @keydown='onChange' v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-        <button type='button' @click='onClick' :disabled="setDisabled(value, id)" 
+        <button type='button' @click='onClick' 
           class="btn btn-secondary btg-lg p-3 w-25 fw-bold fs-5">
           Search
         </button>
@@ -49,7 +48,8 @@ export default {
         options = ref([]),
         results = ref([]),
         item = ref({}),
-        id = NaN
+        id = null,
+        disabled = true
       onMounted(async() => {
         var tables = await api.tables.list()
         console.log(tables)
@@ -62,39 +62,36 @@ export default {
         id,
         item,
         toast,
-        formatString
+        formatString,
+        disabled
       }
     },
     methods: {
-      setDisabled() {
-        let args = Array.prototype.slice.call(arguments, 0)
-        console.log(args)
-        var bool = args.some(arg => arg == null)
-        return bool
-      },
-      async onTableSelect(event) {
-        if (event) event.preventDefault()
-        console.log(this.id, this.value)
-        var value = this.value
+      async onTableSelect(value) {
         if (value) {
+          this.value = value
           this.results = await api.collections(value).browse().then(_ => {
               if (_) console.log(_)
               return _.data
           })
+          this.disabled = this.value == null && this.id == null
+          console.log(this.disabled)
         }
       },
       onChange(event) {
         var value = (event.target.type == 'number') ? parseInt(event.target.value) : event.target.value
         console.log(value, typeof value)
-        this.id = value ?? null
+        this.id = (isNaN(value)) ? null : (value ?? null)
+        this.disabled = this.value == null && this.id == null
+        console.log(this.disabled)
       },
       async onClick() {
-        switch(false) {
-          case this.value:
-            this.toast.error(`The Value for Table is Empty`)
+        switch(true) {
+          case this.value == null:
+            this.toast.error(`The input for table is empty`)
             break
-          case this.id:
-            this.toast.error(`The Value for ID is Empty`)
+          case this.id == null:
+            this.toast.error(`The input for ID is empty`)
             break
           default:
             this.item = await api.collections(this.value).read(this.id).then(_ => {

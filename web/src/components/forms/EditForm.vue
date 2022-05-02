@@ -5,17 +5,16 @@
                 <div class='fs-3 fw-light'>Choose your table: </div>
                 <vue-select v-model="value" :update="value"
                 :loading='!(options?.length > 0)'
-                :close-on-select="true" @click="onSelect"
+                :close-on-select="true" @selected="onSelect"
                 search-placeholder="Search for table"
                 :options="options" searchable class='w-100 form-control'/>
             </div>
             <div class='w-25 vstack gap-3'>
                 <div class='fs-3 fw-light'>Type your ID: </div>
-                <input type='number' class='form-control' @change='onChange' 
-                v-model.number='id' />
+                <input type='number' class='form-control' @keydown='onChange' v-model.number='id' />
             </div>
             <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-                <button type='button' @click='onClick' :disabled="value == null && id == null"
+                <button type='button' @click='onClick'
                 class="btn btn-success btg-lg p-3 w-25 fw-bold fs-5">
                 Find
                 </button>
@@ -65,7 +64,6 @@ export default {
         const toast = useToast()
         var value = ref(null),
             options = ref([]),
-            results = ref([]),
             fields = ref([]),
             data = ref({}),
             changed = ref({}),
@@ -78,9 +76,8 @@ export default {
         return {
             value, 
             options,
-            changed,
-            results,
             fields,
+            changed,
             data,
             schema,
             id,
@@ -89,44 +86,48 @@ export default {
         }
     },
     methods: {
-        async onSelect(event) {
-            if (event) event.preventDefault()
-            var value = this.value
-            if (value) {
-                this.results = await api.collections(value).browse().then(_ => {
-                    if (_) console.log(_)
-                    return _.data
-                })
-            } else {
-                console.log(this.loaded)
-            }
+        async onSelect() {
+            this.changed = {}
+            this.fields = [] 
+            this.schema = null 
         },
         async onSubmit(event) {
             if (event) event.preventDefault()
-            await api.collections(this.value).edit(this.id, this.changed)
-                .then(() => {
-                    this.toast.success(`Updated Data to the ${this.value} Table`)
-                })
-                .catch(e => {
-                    console.log(e)
-                    this.toast.error(`Failed to Update Data to the ${this.value} Table`)
-                })
+            var prev = await api.collections(this.value).read(this.id)
+            switch(true) {
+                case this.changed && (Object.keys(this.changed).length <= 0):
+                case this.changed && (Object.keys(this.changed).every(_ => prev[_] == this.changed[_])):
+                    console.log(Object.keys(this.data).every(_ => prev[_] == this.changed[_]), prev, this.changed)
+                    this.toast.error(`No changes to the data are made`)
+                    break
+                default: 
+                    console.log(Object.keys(this.changed).every(_ => prev[_] == this.changed[_]), prev, this.changed)
+                    await api.collections(this.value).edit(this.id, this.changed)
+                        .then(() => {
+                            this.toast.success(`Updated Data to the ${this.value} Table`)
+                            this.schema = null
+                            this.$router.push({path: '/browse'})
+                        })
+                        .catch(e => {
+                            console.log(e)
+                            this.toast.error(`Failed to Update Data to the ${this.value} Table`)
+                        })
+                }
         },
         onInputChange(event) {
-            this.changed = { 
-                ...this.changed, 
-                [event.target.name]: event.target.value
-            }
-            console.log(this.changed)
+            this.changed[event.target.name] = event.target.value
         },
         onChange(event) {
-            console.log(event.target.value)
+            this.changed = {}
+            this.fields = [] 
+            this.schema = null 
             this.id = event.target.value
         },
         async onClick() {
             const getType = (type) => {
                 var typeName = (type.includes('(')) ? 
-                        type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
+                        type.split('(')?.at(0).toLowerCase() : type.toLowerCase(),
+                    length = type.split('(')?.at(1).replaceAll(')', '').split(',')
                 switch(typeName) {
                     case 'tinyint':
                     case 'smallint':
@@ -137,52 +138,68 @@ export default {
                     case 'float':
                     case 'double':
                     case 'bit':
-                        return 'number'
+                        var nmaxlen = (length?.at(0)) ? { maxlength: length?.at(0)} : {}
+                        return {
+                            type: 'number',
+                            ...nmaxlen
+                        }
                     case 'longtext':
                     case 'longblob':
-                        return 'textarea'
+                        return {
+                            type: 'textarea',
+                        }
                     case 'year':
                     case 'date':
-                        return 'date'
+                        return {
+                            type: 'date',
+                        }
                     case 'time':
-                        return 'time'
+                        return {
+                            type: 'time',
+                        }
                     case 'datetime':
                     case 'timestamp':
-                        return 'datetime-local'
+                        return {
+                            type: 'datetime-local',
+                        }
                     case 'json':
-                        return 'select'
+                        return {
+                            type: 'select',
+                        }
                     default:
-                        return 'text'
+                        var cmaxlen = (length?.at(0)) ? { maxlength: length?.at(0)} : {}
+                        return {
+                            type: 'text',
+                            ...cmaxlen
+                        }
                 }
             }
-            switch(false) {
-                case this.value:
+            switch(true) {
+                case this.value == null:
                     this.toast.error(`The Value for Table is Empty`)
                     break
-                case this.id:
+                case this.id == null:
                     this.toast.error(`The Value for ID is Empty`)
                     break
                 default:
                     this.data = await api.collections(this.value).read(this.id).then(_ => {
                         if (_) {
                             delete _.id
-                            console.log(_)
                         }
                         return _
                     })
                     this.fields = await api.collections(this.value).getFields().then(_ => {
-                        if (_) console.log(_)
                         return _
                     })
                     this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
                         .map(_ => ({
                             $cmp: 'FormKit',
                             props: {
-                                type: getType(_.Type),
+                            ...getType(_.Type),
                                 name: _.Field,
                                 label: `Enter ${_.Field}`,
                                 validation: (_.Null === 'YES') ? 'optional' : 'required',
-                                value: `$${_.Field}`
+                                value: `$${_.Field}`,
                             },
                         }))
                     this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
@@ -190,7 +207,6 @@ export default {
         }
     },
     unmounted() {
-        this.results = []
         this.value = null
         this.options = []
         this.fields = []
