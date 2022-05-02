@@ -42,3 +42,7 @@
 
      - ```/api/items/:collection/delete/id/:id``` (delete item by id within the specific collection)
        - Example ```/api/items/collection/delete/1```
+6. Takedown Docker Container
+   ```zsh
+    docker compose down -v --rmi local
+   ```
