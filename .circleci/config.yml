@@ -20,6 +20,9 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
           container-image-name-updates: 'container=joealdproj-service'
@@ -35,6 +38,9 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
           container-image-name-updates: 'container=joealdproj-service'
