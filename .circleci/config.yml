@@ -21,10 +21,8 @@ jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
-          dockerfile: Dockerfile
-          path: /api
+          path: ./api
           push-image: true
-          region: AWS_REGION
           registry-id: AWS_ECR_REGISTRY_ID
           repo: '${API_PREFIX}-api'
   build_and_deploy_web:
@@ -38,10 +36,8 @@ jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
-          dockerfile: Dockerfile
-          path: /web
+          path: ./web
           push-image: true
-          region: AWS_REGION
           registry-id: AWS_ECR_REGISTRY_ID
           repo: '${API_PREFIX}-web'
 
