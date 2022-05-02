@@ -92,6 +92,7 @@ export default {
             this.toast.error(`Failed to Delete Data to the ${this.value} Table`)
           })
         }
+      }
     },
     unmounted() {
       this.value = null
