@@ -15,7 +15,7 @@
           v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-        <button type='button' @click='onClick' :disabled="id !== null && value !== null"
+        <button type='button' @click='onClick' :disabled="setDisabled(value, id)" 
           class="btn btn-secondary btg-lg p-3 w-25 fw-bold fs-5">
           Search
         </button>
@@ -49,7 +49,7 @@ export default {
         options = ref([]),
         results = ref([]),
         item = ref({}),
-        id = null
+        id = NaN
       onMounted(async() => {
         var tables = await api.tables.list()
         console.log(tables)
@@ -66,8 +66,15 @@ export default {
       }
     },
     methods: {
+      setDisabled() {
+        let args = Array.prototype.slice.call(arguments, 0)
+        console.log(args)
+        var bool = args.some(arg => arg == null)
+        return bool
+      },
       async onTableSelect(event) {
         if (event) event.preventDefault()
+        console.log(this.id, this.value)
         var value = this.value
         if (value) {
           this.results = await api.collections(value).browse().then(_ => {
@@ -77,8 +84,9 @@ export default {
         }
       },
       onChange(event) {
-        console.log(event.target.value)
-        this.id = event.target.value
+        var value = (event.target.type == 'number') ? parseInt(event.target.value) : event.target.value
+        console.log(value, typeof value)
+        this.id = value ?? null
       },
       async onClick() {
         switch(false) {
@@ -93,7 +101,8 @@ export default {
                 if (_) console.log(_)
                 this.toast.success(`Read Data with ID ${this.id} ${this.value} Table`)
                 return _
-            }).catch(() => {
+            }).catch((e) => {
+                console.log(e)
                 this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
             })
         }

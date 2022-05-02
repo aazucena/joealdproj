@@ -15,7 +15,7 @@
                 v-model.number='id' />
             </div>
             <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-                <button type='button' @click='onClick'
+                <button type='button' @click='onClick' :disabled="value == null && id == null"
                 class="btn btn-success btg-lg p-3 w-25 fw-bold fs-5">
                 Find
                 </button>
@@ -107,7 +107,8 @@ export default {
                 .then(() => {
                     this.toast.success(`Updated Data to the ${this.value} Table`)
                 })
-                .catch(() => {
+                .catch(e => {
+                    console.log(e)
                     this.toast.error(`Failed to Update Data to the ${this.value} Table`)
                 })
         },
@@ -123,6 +124,37 @@ export default {
             this.id = event.target.value
         },
         async onClick() {
+            const getType = (type) => {
+                var typeName = (type.includes('(')) ? 
+                        type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
+                switch(typeName) {
+                    case 'tinyint':
+                    case 'smallint':
+                    case 'mediumint':
+                    case 'int':
+                    case 'bigint':
+                    case 'decimal':
+                    case 'float':
+                    case 'double':
+                    case 'bit':
+                        return 'number'
+                    case 'longtext':
+                    case 'longblob':
+                        return 'textarea'
+                    case 'year':
+                    case 'date':
+                        return 'date'
+                    case 'time':
+                        return 'time'
+                    case 'datetime':
+                    case 'timestamp':
+                        return 'datetime-local'
+                    case 'json':
+                        return 'select'
+                    default:
+                        return 'text'
+                }
+            }
             switch(false) {
                 case this.value:
                     this.toast.error(`The Value for Table is Empty`)
@@ -131,63 +163,29 @@ export default {
                     this.toast.error(`The Value for ID is Empty`)
                     break
                 default:
-                    await run()
-            }
-            const run = async() => {
-                this.data = await api.collections(this.value).read(this.id).then(_ => {
-                    if (_) {
-                        delete _.id
-                        console.log(_)
-                    }
-                    return _
-                })
-                this.fields = await api.collections(this.value).getFields().then(_ => {
-                    if (_) console.log(_)
-                    return _
-                })
-                const getType = (type) => {
-                    var typeName = (type.includes('(')) ? 
-                            type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
-                    switch(typeName) {
-                        case 'tinyint':
-                        case 'smallint':
-                        case 'mediumint':
-                        case 'int':
-                        case 'bigint':
-                        case 'decimal':
-                        case 'float':
-                        case 'double':
-                        case 'bit':
-                            return 'number'
-                        case 'longtext':
-                        case 'longblob':
-                            return 'textarea'
-                        case 'year':
-                        case 'date':
-                            return 'date'
-                        case 'time':
-                            return 'time'
-                        case 'datetime':
-                        case 'timestamp':
-                            return 'datetime-local'
-                        case 'json':
-                            return 'select'
-                        default:
-                            return 'text'
-                    }
-                }
-                this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
-                    .map(_ => ({
-                        $cmp: 'FormKit',
-                        props: {
-                            type: getType(_.Type),
-                            name: _.Field,
-                            label: `Enter ${_.Field}`,
-                            validation: (_.Null === 'YES') ? 'optional' : 'required',
-                            value: `$${_.Field}`
-                        },
-                    }))
-                this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
+                    this.data = await api.collections(this.value).read(this.id).then(_ => {
+                        if (_) {
+                            delete _.id
+                            console.log(_)
+                        }
+                        return _
+                    })
+                    this.fields = await api.collections(this.value).getFields().then(_ => {
+                        if (_) console.log(_)
+                        return _
+                    })
+                    this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
+                        .map(_ => ({
+                            $cmp: 'FormKit',
+                            props: {
+                                type: getType(_.Type),
+                                name: _.Field,
+                                label: `Enter ${_.Field}`,
+                                validation: (_.Null === 'YES') ? 'optional' : 'required',
+                                value: `$${_.Field}`
+                            },
+                        }))
+                    this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
             }
         }
     },

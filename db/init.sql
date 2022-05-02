@@ -41,7 +41,7 @@ INSERT INTO `users`(`first_name`,`last_name`,`age`) VALUE
 CREATE TABLE IF NOT EXISTS `store_items` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(64) NOT NULL,
-    `price` FLOAT(4, 2) DEFAULT 0.00,
+    `price` DOUBLE DEFAULT 0.00,
     PRIMARY KEY (id)
 );
 

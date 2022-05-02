@@ -15,7 +15,7 @@
           v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
-        <button type='button' @click='onClick' :disabled="id !== null && value !== null"
+        <button type='button' @click='onClick' :disabled="value == null && id == null"
           class="btn btn-warning btg-lg p-3 w-25 fw-bold fs-5">
           Delete
         </button>
@@ -81,16 +81,14 @@ export default {
                 this.toast.error(`The Value for ID is Empty`)
                 break
             default:
-                await run()
-        }
-        const run = async() => {
-          await api.collections(this.value).delete(this.id)
-          .then(() => {
-            this.toast.success(`Delete Data to the ${this.value} Table`)
-          })
-          .catch(() => {
-            this.toast.error(`Failed to Delete Data to the ${this.value} Table`)
-          })
+              await api.collections(this.value).delete(this.id)
+              .then(() => {
+                this.toast.success(`Delete Data to the ${this.value} Table`)
+              })
+              .catch((e) => {
+                console.log(e)
+                this.toast.error(`Failed to Delete Data to the ${this.value} Table`)
+              })
         }
       }
     },

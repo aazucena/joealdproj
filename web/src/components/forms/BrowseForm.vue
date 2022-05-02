@@ -6,9 +6,7 @@
     :close-on-select="true" @click="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
-    <div v-if="results.length > 0">
-      <CustomTable :rows="results" />
-    </div>
+    <CustomTable v-if="results.length > 0" :rows="results" />
   </div>
 </template>
 
@@ -47,14 +45,19 @@ export default {
       async onSelect(event) {
         if (event) event.preventDefault()
         if (this.value) {
+          this.results = []
           console.log(this.value)
           this.results = await api.collections(this.value).browse().then(_ => {
               if (_) console.log(_)
               this.toast.success(`Listed Data to the ${this.value} Table`)
               return _.data
-          }).catch(() => {
+          })
+          .catch((e) => {
+              console.log(e)
               this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
           })
+        } else {
+          this.results = []
         }
       },
     },

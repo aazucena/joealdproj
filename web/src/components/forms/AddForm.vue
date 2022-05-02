@@ -128,7 +128,8 @@ export default {
           .then(() => {
             this.toast.success(`Added Data to the ${this.value} Table`)
           })
-          .catch(() => {
+          .catch((e) => {
+            console.log(e)
             this.toast.error(`Failed to Add Data to the ${this.value} Table`)
           })
       },
