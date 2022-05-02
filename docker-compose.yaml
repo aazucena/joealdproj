@@ -36,7 +36,7 @@ services:
       API_PORT: 3000
       LIMIT: 10
       CORS_ENABLED: 'true'
-      CORS_ORIGIN: "http://localhost,http://localhost:3333,http://localhost:8080,http://localhost:8000"
+      CORS_ORIGIN: "http://ec2-54-209-231-23.compute-1.amazonaws.com,http://localhost,http://localhost:3333,http://localhost:8080,http://localhost:8000"
       CORS_METHODS: "GET,POST,PATCH,DELETE,OPTION"
     depends_on:
       - proj_cache
