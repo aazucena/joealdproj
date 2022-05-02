@@ -123,64 +123,83 @@ export default {
             this.id = event.target.value
         },
         async onClick() {
-            this.data = await api.collections(this.value).read(this.id).then(_ => {
-                if (_) {
-                    delete _.id
-                    console.log(_)
-                }
-                return _
-            })
-            this.fields = await api.collections(this.value).getFields().then(_ => {
-                if (_) console.log(_)
-                return _
-            })
-            const getType = (type) => {
-                var typeName = (type.includes('(')) ? 
-                        type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
-                switch(typeName) {
-                    case 'tinyint':
-                    case 'smallint':
-                    case 'mediumint':
-                    case 'int':
-                    case 'bigint':
-                    case 'decimal':
-                    case 'float':
-                    case 'double':
-                    case 'bit':
-                        return 'number'
-                    case 'longtext':
-                    case 'longblob':
-                        return 'textarea'
-                    case 'year':
-                    case 'date':
-                        return 'date'
-                    case 'time':
-                        return 'time'
-                    case 'datetime':
-                    case 'timestamp':
-                        return 'datetime-local'
-                    case 'json':
-                        return 'select'
-                    default:
-                        return 'text'
-                }
+            switch(false) {
+                case this.value:
+                    this.toast.error(`The Value for Table is Empty`)
+                    break
+                case this.id:
+                    this.toast.error(`The Value for ID is Empty`)
+                    break
+                default:
+                    run()
             }
-            this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
-                .map(_ => ({
-                    $cmp: 'FormKit',
-                    props: {
-                        type: getType(_.Type),
-                        name: _.Field,
-                        label: `Enter ${_.Field}`,
-                        validation: (_.Null === 'YES') ? 'optional' : 'required',
-                        value: `$${_.Field}`
-                    },
-                }))
-            this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
+            const run = () => {
+                this.data = await api.collections(this.value).read(this.id).then(_ => {
+                    if (_) {
+                        delete _.id
+                        console.log(_)
+                    }
+                    return _
+                })
+                this.fields = await api.collections(this.value).getFields().then(_ => {
+                    if (_) console.log(_)
+                    return _
+                })
+                const getType = (type) => {
+                    var typeName = (type.includes('(')) ? 
+                            type.split('(')?.at(0).toLowerCase() : type.toLowerCase()
+                    switch(typeName) {
+                        case 'tinyint':
+                        case 'smallint':
+                        case 'mediumint':
+                        case 'int':
+                        case 'bigint':
+                        case 'decimal':
+                        case 'float':
+                        case 'double':
+                        case 'bit':
+                            return 'number'
+                        case 'longtext':
+                        case 'longblob':
+                            return 'textarea'
+                        case 'year':
+                        case 'date':
+                            return 'date'
+                        case 'time':
+                            return 'time'
+                        case 'datetime':
+                        case 'timestamp':
+                            return 'datetime-local'
+                        case 'json':
+                            return 'select'
+                        default:
+                            return 'text'
+                    }
+                }
+                this.schema = this.fields.filter(_ => !['id', 'date_created', 'date_updated'].includes(_.Field))
+                    .map(_ => ({
+                        $cmp: 'FormKit',
+                        props: {
+                            type: getType(_.Type),
+                            name: _.Field,
+                            label: `Enter ${_.Field}`,
+                            validation: (_.Null === 'YES') ? 'optional' : 'required',
+                            value: `$${_.Field}`
+                        },
+                    }))
+                this.toast.success(`Found and Retrieved Data from ${this.value} Table`)
+            }
         }
     },
     unmounted() {
         this.results = []
+        this.value = null
+        this.options = []
+        this.fields = []
+        this.data = {}
+        this.changed = {}
+        this.schema = null
+        this.id = null
     }
 }
 </script>

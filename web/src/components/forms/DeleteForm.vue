@@ -83,7 +83,11 @@ export default {
       }
     },
     unmounted() {
+      this.value = null
+      this.options = []
       this.results = []
+      this.item = {}
+      this.id = null
     }
 }
 </script>

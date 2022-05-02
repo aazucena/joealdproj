@@ -59,6 +59,8 @@ export default {
       },
     },
     unmounted() {
+      this.value = null
+      this.options = []
       this.results = []
     }
 }

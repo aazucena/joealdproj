@@ -141,7 +141,11 @@ export default {
         console.log(this.data)
     },
     unmounted() {
-      this.fields = []
+        this.value = null
+        this.options = []
+        this.fields = []
+        this.data = {}
+        this.schema = []
     }
 }
 </script>

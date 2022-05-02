@@ -81,17 +81,30 @@ export default {
         this.id = event.target.value
       },
       async onClick() {
-          this.item = await api.collections(this.value).read(this.id).then(_ => {
-              if (_) console.log(_)
-              this.toast.success(`Read Data with ID ${this.id} ${this.value} Table`)
-              return _
-          }).catch(() => {
-              this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
-          })
+        switch(false) {
+          case this.value:
+            this.toast.error(`The Value for Table is Empty`)
+            break
+          case this.id:
+            this.toast.error(`The Value for ID is Empty`)
+            break
+          default:
+            this.item = await api.collections(this.value).read(this.id).then(_ => {
+                if (_) console.log(_)
+                this.toast.success(`Read Data with ID ${this.id} ${this.value} Table`)
+                return _
+            }).catch(() => {
+                this.toast.error(`Failed to Retrieve Data from ${this.value} Table`)
+            })
+        }
       }
     },
     unmounted() {
-      this.results = []
+        this.results = []
+        this.value = null
+        this.options = []
+        this.item = {}
+        this.id = null
     }
 }
 </script>
