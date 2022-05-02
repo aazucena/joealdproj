@@ -4,14 +4,14 @@
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
         <vue-select v-model="value"
-        :loading='!(options.length > 0)'
+        :loading='!(options?.length > 0)'
         :close-on-select="true" @click="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
       </div>
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Type your ID: </div>
-        <input type='number' class='form-control' @change='onChange($event)' 
+        <input type='number' class='form-control' @change='onChange' 
           v-model.number='id' />
       </div>
       <div class='w-25 vstack gap-3 d-flex justify-content-end'>
@@ -21,7 +21,7 @@
         </button>
       </div>
     </div>
-    <div v-if="Object.keys(item).length > 0" 
+    <div v-if="item && Object.keys(item)?.length > 0" 
         class="alert alert-info p-2 border border-2 border-info">
       <div v-for='[key, value] in Object.entries(item)' :key='key'>
         <div class="fs-4 fw-normal m-4 hstack gap-4" role="alert">

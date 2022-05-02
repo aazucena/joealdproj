@@ -4,7 +4,7 @@
             <div class='w-25 vstack gap-3'>
                 <div class='fs-3 fw-light'>Choose your table: </div>
                 <vue-select v-model="value" :update="value"
-                :loading='!(options.length > 0)'
+                :loading='!(options?.length > 0)'
                 :close-on-select="true" @click="onSelect"
                 search-placeholder="Search for table"
                 :options="options" searchable class='w-100 form-control'/>
@@ -27,10 +27,10 @@
                 <div class='fs-4 fw-light'>Update Form: </div>
                 <FormKit type="group" class='vstack gap-3' v-model="data">
                     <FormKit v-for='(field, i) in schema' v-bind:key='i' 
-                            :type='field.props.type'
+                            :type='field?.props?.type'
                             :label='formatString(field.props.label)'
-                            :name='field.props.name'
-                            :validation='field.props.validation'
+                            :name='field?.props?.name'
+                            :validation='field?.props?.validation'
                             @change='onInputChange'
                                 />
                     <div class="formkit-wrapper">

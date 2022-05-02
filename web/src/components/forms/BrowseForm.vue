@@ -2,11 +2,11 @@
   <div class="container-fluid vstack gap-4">
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
-    :loading='!(options.length > 0)'
+    :loading='!(options?.length > 0)'
     :close-on-select="true" @click="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
-    <CustomTable v-if="results.length > 0" :rows="results" />
+    <CustomTable v-if="results?.length > 0" :rows="results" />
   </div>
 </template>
 

@@ -2,11 +2,11 @@
     <div class='vstack gap-3'>
         <div class='fs-4'> Result Table:</div>
         <v-table-lite
-            :is-loading="table.isLoading"
-            :columns="table.columns"
-            :rows="table.rows"
-            :total="table.totalRecordCount"
-            :sortable="table.sortable"
+            :is-loading="table?.isLoading"
+            :columns="table?.columns"
+            :rows="table?.rows"
+            :total="table?.totalRecordCount"
+            :sortable="table?.sortable"
             @do-search="doSearch"
             @is-finished="tableLoadingFinish"
             />

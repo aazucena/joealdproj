@@ -2,7 +2,7 @@
   <div class="container-fluid vstack gap-4">
     <div class='fs-3 fw-light'>Choose your table: </div>
     <vue-select v-model="value" :update="value"
-    :loading='!(options.length > 0)'
+    :loading='!(options?.length > 0)'
     :close-on-select="true" @click="onSelect"
     search-placeholder="Search for table"
     :options="options" searchable class='w-100 form-control'/>
@@ -13,9 +13,9 @@
           <FormKit type="group" class='vstack gap-3' v-model="data">
               <FormKit v-for='(field, i) in schema' v-bind:key='i' 
                       :type='field.props.type'
-                      :label='formatString(field.props.label)'
-                      :name='field.props.name'
-                      :validation='field.props.validation'
+                      :label='formatString(field?.props?.label)'
+                      :name='field?.props?.name'
+                      :validation='field?.props?.validation'
                       @change='onInputChange'
                       @keyup='onInputChange'
                   />

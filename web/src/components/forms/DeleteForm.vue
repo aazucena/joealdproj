@@ -4,7 +4,7 @@
       <div class='w-25 vstack gap-3'>
         <div class='fs-3 fw-light'>Choose your table: </div>
         <vue-select v-model="value" :update="value"
-        :loading='!(options.length > 0)'
+        :loading='!(options?.length > 0)'
         :close-on-select="true" @click="onTableSelect"
         search-placeholder="Search for table"
         :options="options" searchable class='w-100 form-control'/>
