@@ -5,11 +5,13 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@3.1.0
   aws-ecr: circleci/aws-ecr@8.1.0
-  aws-ecs: circleci/aws-ecs@2.2.1
 
-workflows:
+jobs:
   build-and-deploy-api:
-    jobs:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
@@ -18,12 +20,11 @@ workflows:
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-api'
           tag: '${CIRCLE_SHA1}'
-          filters:
-            branches:
-              only:
-                - main
   build-and-deploy-web:
-    jobs:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
@@ -32,20 +33,19 @@ workflows:
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-web'
           tag: '${CIRCLE_SHA1}'
+
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-deploy-api:
           filters:
             branches:
               only:
                 - main
-  ecs_deployment:
-    jobs:
-      - aws-ecs/deploy-service-update:
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          aws-region: AWS_DEFAULT_REGION
-          family: 'joealdproj-service'
-          cluster-name: 'joealdproj-cluster'
-          container-image-name-updates: 'container=joealdproj-service,image-and-tag=${AWS_ECR_ACCOUNT_URL}/joealdproj-web:${CIRCLE_SHA1},image-and-tag=${AWS_ECR_ACCOUNT_URL}/joealdproj-api:${CIRCLE_SHA1}'
-          verify-revision-is-deployed: true
+      - build-and-deploy-web:
+          requires:
+            - build-and-deploy-api
           filters:
             branches:
               only:
