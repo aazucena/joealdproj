@@ -16,13 +16,13 @@ workflows:
           path: ./api
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
-          repo: '${API_PREFIX}-api'
+          repo: 'joealdproj-api'
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
-          family: '${APP_PREFIX}-service'
-          cluster-name: '${APP_PREFIX}-cluster'
-          container-image-name-updates: 'container=${APP_PREFIX}-service'
+          family: 'joealdproj-service'
+          cluster-name: 'joealdproj-cluster'
+          container-image-name-updates: 'container=joealdproj-service'
   build-and-deploy-web:
     jobs:
       - aws-ecr/build-and-push-image:
@@ -31,11 +31,11 @@ workflows:
           path: ./web
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
-          repo: '${API_PREFIX}-web'
+          repo: 'joealdproj-web'
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
-          family: '${APP_PREFIX}-service'
-          cluster-name: '${APP_PREFIX}-cluster'
-          container-image-name-updates: 'container=${APP_PREFIX}-service'
+          family: 'joealdproj-service'
+          cluster-name: 'joealdproj-cluster'
+          container-image-name-updates: 'container=joealdproj-service'
       
