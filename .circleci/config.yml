@@ -17,6 +17,7 @@ workflows:
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-api'
+          tag: '${CIRCLE_SHA1}'
           filters:
             branches:
               only:
@@ -29,7 +30,7 @@ workflows:
           aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
-          container-image-name-updates: 'container=joealdproj-service'
+          container-image-name-updates: 'container=joealdproj-service,image-and-tag=${AWS_ECR_ACCOUNT_URL}/joealdproj-api:${CIRCLE_SHA1}'
           filters:
             branches:
               only:
@@ -43,6 +44,7 @@ workflows:
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-web'
+          tag: '${CIRCLE_SHA1}'
           filters:
             branches:
               only:
@@ -55,7 +57,8 @@ workflows:
           aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
-          container-image-name-updates: 'container=joealdproj-service'
+          container-image-name-updates: 'container=joealdproj-service,image-and-tag=${AWS_ECR_ACCOUNT_URL}/joealdproj-web:${CIRCLE_SHA1}'
+          verify-revision-is-deployed: true
           filters:
             branches:
               only:
