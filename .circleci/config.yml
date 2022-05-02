@@ -12,7 +12,7 @@ workflows:
     jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           path: ./api
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
@@ -21,7 +21,7 @@ workflows:
           requires:
             - aws-ecr/build-and-push-image
           aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
@@ -30,7 +30,7 @@ workflows:
     jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           path: ./web
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
@@ -39,7 +39,7 @@ workflows:
           requires:
             - aws-ecr/build-and-push-image
           aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           aws-region: AWS_DEFAULT_REGION
           family: 'joealdproj-service'
           cluster-name: 'joealdproj-cluster'
