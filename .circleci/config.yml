@@ -7,17 +7,9 @@ orbs:
   aws-ecr: circleci/aws-ecr@8.1.0
   aws-ecs: circleci/aws-ecs@2.2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  build_and_deploy_api:
-    docker:
-      - image: cimg/base:stable
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
-    steps:
-      - checkout
+workflows:
+  build-and-deploy-api:
+    jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
@@ -25,14 +17,14 @@ jobs:
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
           repo: '${API_PREFIX}-api'
-  build_and_deploy_web:
-    docker:
-      - image: cimg/base:stable
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
-    steps:
-      - checkout
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: '${APP_PREFIX}-service'
+          cluster-name: '${APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${APP_PREFIX}-service'
+  build-and-deploy-web:
+    jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ID
@@ -40,18 +32,9 @@ jobs:
           push-image: true
           registry-id: AWS_ECR_REGISTRY_ID
           repo: '${API_PREFIX}-web'
-
-workflows:
-  build-and-deploy:
-    jobs:
-      - build_and_deploy_api
-      - build_and_deploy_web:
-          requires:
-            - build_and_deploy_api
       - aws-ecs/deploy-service-update:
           requires:
-            - build_and_deploy_api
-            - build_and_deploy_web
+            - aws-ecr/build-and-push-image
           family: '${APP_PREFIX}-service'
           cluster-name: '${APP_PREFIX}-cluster'
           container-image-name-updates: 'container=${APP_PREFIX}-service'
