@@ -23,7 +23,7 @@ services:
       MYSQL_DATABASE: proj_db
   api:
     container_name: api
-    image: aazucena/joealdproj-api:latest
+    image: 120632476280.dkr.ecr.us-east-1.amazonaws.com/joealdproj-api:latest
     networks:
       - frontend
       - backend
@@ -45,7 +45,7 @@ services:
       - "3000:3000"
   web:
     container_name: web
-    image: aazucena/joealdproj-web:latest
+    image: 120632476280.dkr.ecr.us-east-1.amazonaws.com/joealdproj-web:latest
     networks:
       - frontend
     environment:
