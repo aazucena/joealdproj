@@ -6,12 +6,9 @@ orbs:
   aws-cli: circleci/aws-cli@3.1.0
   aws-ecr: circleci/aws-ecr@8.1.0
 
-jobs:
-  build-and-deploy-api:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
+workflows:
+  build-and-deploy:
+    jobs:
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
@@ -20,11 +17,10 @@ jobs:
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-api'
           tag: '${CIRCLE_SHA1}'
-  build-and-deploy-web:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
+          filters:
+            branches:
+              only:
+                - main
       - aws-ecr/build-and-push-image:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
@@ -33,19 +29,6 @@ jobs:
           registry-id: AWS_ECR_REGISTRY_ID
           repo: 'joealdproj-web'
           tag: '${CIRCLE_SHA1}'
-
-
-workflows:
-  build-and-deploy:
-    jobs:
-      - build-and-deploy-api:
-          filters:
-            branches:
-              only:
-                - main
-      - build-and-deploy-web:
-          requires:
-            - build-and-deploy-api
           filters:
             branches:
               only:
