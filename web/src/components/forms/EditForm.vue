@@ -131,9 +131,9 @@ export default {
                     this.toast.error(`The Value for ID is Empty`)
                     break
                 default:
-                    run()
+                    await run()
             }
-            const run = () => {
+            const run = async() => {
                 this.data = await api.collections(this.value).read(this.id).then(_ => {
                     if (_) {
                         delete _.id

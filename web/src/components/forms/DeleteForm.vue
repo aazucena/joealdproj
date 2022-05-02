@@ -62,10 +62,10 @@ export default {
         if (event) event.preventDefault()
         var value = this.value
         if (value) {
-          this.results = await api.collections(value).browse().then(_ => {
-              if (_) console.log(_)
-              return _.data
-          })
+            this.results = await api.collections(value).browse().then(_ => {
+                if (_) console.log(_)
+                return _.data
+            })
         }
       },
       onChange(event) {
@@ -73,6 +73,17 @@ export default {
         this.id = event.target.value
       },
       async onClick() {
+        switch(false) {
+            case this.value:
+                this.toast.error(`The Value for Table is Empty`)
+                break
+            case this.id:
+                this.toast.error(`The Value for ID is Empty`)
+                break
+            default:
+                await run()
+        }
+        const run = async() => {
           await api.collections(this.value).delete(this.id)
           .then(() => {
             this.toast.success(`Delete Data to the ${this.value} Table`)
@@ -80,7 +91,7 @@ export default {
           .catch(() => {
             this.toast.error(`Failed to Delete Data to the ${this.value} Table`)
           })
-      }
+        }
     },
     unmounted() {
       this.value = null
